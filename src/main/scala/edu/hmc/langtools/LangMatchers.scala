@@ -1,12 +1,13 @@
 package langtools
 
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.matchers.Matcher
-import org.scalatest.matchers.MatchResult
-import scala.util.parsing.combinator.Parsers
 import scala.language.implicitConversions
+import scala.util.parsing.combinator.Parsers
 
-trait LangParseMatchers[IR] extends ShouldMatchers {
+import org.scalatest.Matchers
+import org.scalatest.matchers.MatchResult
+import org.scalatest.matchers.Matcher
+
+trait LangParseMatchers[IR] extends Matchers {
   
   val parser: String ⇒ Parsers#ParseResult[IR]
     
@@ -31,7 +32,6 @@ trait LangParseMatchers[IR] extends ShouldMatchers {
       MatchResult( left.parseResult.get == prog,
         "should NOT parse as " + left.parseResult.get,
         "parsed correctly")
-    
   }
 }
 
@@ -54,11 +54,11 @@ trait LangInterpretMatchers[IR, SD] extends LangParseMatchers[IR] {
         "evaluated correctly")
   }
   
-  def raiseError[T](implicit manifest: Manifest[T]) =  
+  def raiseError[ET](implicit manifest: Manifest[ET]) =  
     new Matcher[InterpretedProgram] {
       def apply(left: InterpretedProgram) = {
         // we're just wrapping this matcher:
-        evaluating{left.result} should produce [T]
+        an [ET] should be thrownBy{left.result}
         MatchResult(true,
             "no one should ever see this",
             "raised the expected error") 
@@ -66,7 +66,8 @@ trait LangInterpretMatchers[IR, SD] extends LangParseMatchers[IR] {
     }
 }
 
-trait StoreMatchers[SD,XD,VD] extends ShouldMatchers {this: LangInterpretMatchers[_,SD] ⇒
+trait StoreMatchers[SD,XD,VD] extends Matchers {
+  this: LangInterpretMatchers[_,SD] ⇒
  
   def lookup(x: XD, r: SD): Option[VD]
 

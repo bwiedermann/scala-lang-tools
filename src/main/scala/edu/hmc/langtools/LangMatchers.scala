@@ -1,4 +1,4 @@
-package langtools
+package edu.hmc.langtools
 
 import scala.language.implicitConversions
 import scala.util.parsing.combinator.Parsers
@@ -37,7 +37,7 @@ trait LangParseMatchers[IR] extends Matchers {
 
 trait LangInterpretMatchers[IR, SD] extends LangParseMatchers[IR] { 
   
-  val interpreter: langtools.Interpreter[IR, SD]
+  val interpreter: Interpreter[IR, SD]
   
   class InterpretedProgram(source: String) extends ParsedProgram(source) {
     lazy val result: SD = interpreter.eval(parseResult.get) 
